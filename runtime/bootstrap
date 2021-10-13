@@ -1,0 +1,75 @@
+#!/usr/bin/php
+
+<?php
+/* Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+use GuzzleHttp\Client;
+
+// This invokes Composer's autoloader so that we'll be able to use Guzzle and any other 3rd party libraries we need.
+$vendor_dir = '/opt/vendor';
+require $vendor_dir . '/autoload.php';
+
+// This is the request processing loop. Barring unrecoverable failure, this loop runs until the environment shuts down.
+do {
+    // Ask the runtime API for a request to handle.
+    $request = getNextRequest();
+
+    // Obtain the function name from the _HANDLER environment variable and ensure the function's code is available.
+    $handler = explode('.', $_ENV['_HANDLER']);
+
+    if (count($handler) !== 2) {
+        throw new Exception(sprintf('Handler expected to be in the format: <filename>.<function>, found %s', $_ENV['_HANDLER']));
+    }
+
+    $file = $_ENV['LAMBDA_TASK_ROOT'] . '/' . $handler[0] . '.php';
+
+    if (!file_exists($file)) {
+        throw new Exception(sprintf('File %s does not exist', $file));
+    }
+
+    require_once $file;
+
+    $function = $handler[1];
+
+    if (!function_exists($function)) {
+        throw new Exception(sprintf('Function %s does not exist', $function));
+    }
+
+    // Execute the desired function and obtain the response.
+    $response = $function($request['payload']);
+
+    // Submit the response back to the runtime API.
+    sendResponse($request['invocationId'], $response);
+} while (true);
+
+function getNextRequest()
+{
+    $client = new Client();
+    $response = $client->get('http://' . $_ENV['AWS_LAMBDA_RUNTIME_API'] . '/2018-06-01/runtime/invocation/next');
+
+    return array(
+      'invocationId' => $response->getHeader('Lambda-Runtime-Aws-Request-Id')[0],
+      'payload' => json_decode((string) $response->getBody(), true)
+    );
+}
+
+function sendResponse($invocationId, $response)
+{
+    $client = new Client();
+    $client->post(
+    'http://' . $_ENV['AWS_LAMBDA_RUNTIME_API'] . '/2018-06-01/runtime/invocation/' . $invocationId . '/response',
+       array('body' => $response)
+    );
+}

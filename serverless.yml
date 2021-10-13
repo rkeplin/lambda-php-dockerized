@@ -1,0 +1,19 @@
+service: php-lambda
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  lambdaHashingVersion: 20201221
+  profile: rkeplin-sandbox
+  ecr:
+    images:
+      baseimage:
+        path: .
+        file: Dockerfile
+
+functions:
+  hello:
+    image: baseimage
+    runtime: provided
+    description: Dockerized "Hello World" PHP function
