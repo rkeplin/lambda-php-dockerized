@@ -31,7 +31,7 @@ docker image build -t phplambda .
 
 ### Spin up the container
 ```
-docker run -v ~/.aws-lambda-rie:/aws-lambda --entrypoint /aws-lambda/aws-lambda-rie  -p 9000:8080 phplambda:latest /var/runtime/bootstrap index.hello
+docker run -v ~/.aws-lambda-rie:/aws-lambda --entrypoint /aws-lambda/aws-lambda-rie  -p 9000:8080 phplambda:latest /var/runtime/bootstrap handler.process
 ```
 
 ### Test the local lambda
