@@ -33,7 +33,7 @@ function process($data)
  *
  * @param   array   $body
  * @param   int     $status_code
- * @return  array
+ * @return  string
  */
 function http_response($body, $status_code)
 {

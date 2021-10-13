@@ -30,5 +30,5 @@ WORKDIR /var/task
 ENV LAMBDA_RUNTIME_DIR /var/runtime
 ENV LAMBDA_TASK_ROOT /var/task
 
-ENTRYPOINT [ '/var/runtime/bootstrap' ]
-CMD [ 'handler.process' ]
+ENTRYPOINT [ "/var/runtime/bootstrap" ]
+CMD [ "handler.process" ]
