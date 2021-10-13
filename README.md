@@ -1,5 +1,5 @@
 # Introduction
-This is a boilerplate for running a PHP lambda function in AWS.  The same pattern may be used for other languages that aren't supported by AWS out of the box.
+This is a getting started guide for running a PHP lambda function in AWS.  The same pattern may be used for other languages that aren't supported by AWS out of the box.
 
 # Prerequisite
 * Install docker
