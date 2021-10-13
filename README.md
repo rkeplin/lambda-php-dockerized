@@ -36,7 +36,7 @@ docker run -v ~/.aws-lambda-rie:/aws-lambda --entrypoint /aws-lambda/aws-lambda-
 
 ### Test the local lambda
 ```
-curl "http://192.168.22.100:9000/2015-03-31/functions/function/invocations" -d '{"name":"Test"}'
+curl "http://127.0.0.1:9000/2015-03-31/functions/function/invocations" -d '{"name":"Test"}'
 ```
 
 # Testing on AWS
